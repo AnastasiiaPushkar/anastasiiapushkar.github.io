@@ -279,40 +279,40 @@
       </div>
 
       <div class="grid">
-        <a class="case" href="work/noctov.html">
+        <a class="case" href="work/noctov">
           <figure class="r32"><img src="img/noctov.jpg" alt="NOCTOV monogram on a city billboard against a blue sky" loading="lazy"></figure>
           <div class="cap"><h3>NOCTOV</h3><p>Eyewear brand. Monogram and identity</p></div>
         </a>
 
         <div class="row row-2">
-          <a class="case" href="work/herbier.html">
+          <a class="case" href="work/herbier">
             <figure class="r45"><img src="img/herbier.jpg" alt="herbier hand-drawn poppy seal over a bouquet of flowers" loading="lazy"></figure>
             <div class="cap"><h3>herbier</h3><p>Flower shop. Name, hand-drawn seal and identity</p></div>
           </a>
-          <a class="case" href="work/elevated-dough.html">
+          <a class="case" href="work/elevated-dough">
             <figure class="r45"><img src="img/dough.jpg" alt="Hands opening a blue Elevated Dough box of chocolate pastries" loading="lazy"></figure>
             <div class="cap"><h3>Elevated Dough</h3><p>Gluten-free bakery. Logo and identity</p></div>
           </a>
         </div>
 
-        <a class="case" href="work/mireva.html">
+        <a class="case" href="work/mireva">
           <figure class="r32"><img src="img/mireva.jpg" alt="MIREVA striped cosmetic bag and peptide cream jar on pale blue" loading="lazy"></figure>
           <div class="cap"><h3>MIREVA</h3><p>Clean skincare. Identity and packaging</p></div>
         </a>
 
         <div class="row row-mix">
-          <a class="case" href="work/koji.html">
+          <a class="case" href="work/koji">
             <figure class="r45"><img src="img/koji.jpg" alt="A bamboo whisk dripping matcha into a ceramic bowl under the KOJI wordmark" loading="lazy"></figure>
             <div class="cap"><h3>KOJI</h3><p>Matcha brand. Hand-drawn lettering and identity</p></div>
           </a>
-          <a class="case" href="work/brea.html">
+          <a class="case" href="work/brea">
             <figure class="rbrea"><img src="img/brea.jpg" alt="BREA cards with an engraved cheetah and the line Rest well, on navy paper" loading="lazy"></figure>
             <div class="cap"><h3>BREA</h3><p>Brand identity and mascot</p></div>
           </a>
         </div>
       </div>
 
-      <div class="all"><a class="btn" href="all-work.html">See all work</a></div>
+      <div class="all"><a class="btn" href="all-work">See all work</a></div>
     </div>
   </section>
 
@@ -491,7 +491,7 @@
     document.getElementById('moodTitle').textContent=m.title;
     var nm=(nameIn.value||'').trim()||'your brand';document.getElementById('moodText').textContent='You picked '+chosen[0]+', '+chosen[1]+' and '+chosen[2]+'. '+m.say.replace('{n}',nm);document.getElementById('whyPal').textContent=m.palWhy;document.getElementById('whyType').textContent=m.typeWhy;
     document.getElementById('moodFonts').textContent='Type pairing: '+m.fontName;
-    var c=CASES[m.case];document.getElementById('likeImg').src=c[1];document.getElementById('likeImg').alt=c[0]+' cover';var a=document.getElementById('likeLink');a.textContent=c[0];a.href='work/'+m.case+'.html';
+    var c=CASES[m.case];document.getElementById('likeImg').src=c[1];document.getElementById('likeImg').alt=c[0]+' cover';var a=document.getElementById('likeLink');a.textContent=c[0];a.href='work/'+m.case;
     var n=(nameIn.value||'').trim()||'my brand';
     var body='Hi Anastasiia,\n\nI tried the brand mood on your site.\nBrand: '+n+'\nWords: '+chosen.join(', ')+'\nMood: '+m.title+' ('+m.pal.join(', ')+')\n\nHere is a bit about my project:\n';
     window.__moodMail='mailto:nasstas.iss@icloud.com?subject='+encodeURIComponent('New project: '+n)+'&body='+encodeURIComponent(body);
