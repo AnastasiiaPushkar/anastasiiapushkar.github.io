@@ -153,7 +153,15 @@
   .mood-go{justify-self:start}
   .mood-go:disabled{opacity:.35;cursor:not-allowed}
   .result{margin-top:clamp(48px,6vw,80px);background:var(--paper);display:grid;grid-template-columns:1.1fr .9fr;opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+  .result[hidden]{display:none}
   .result.show{opacity:1;transform:none}
+  .why .say{font-size:17px}
+  .why h4{font-size:13px;font-weight:500;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:4px}
+  .why .reason p{font-size:15px}
+  .why .sec{display:flex;gap:6px 18px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  .why .sec .btn{height:40px;font:500 14px "Montserrat",sans-serif;background:transparent;color:var(--ink);cursor:pointer}
+  .why .actions .btn-solid{height:auto;min-height:54px;padding:14px 26px;text-align:center}
+  .why .toast{font-size:13px;color:var(--burgundy);min-height:1em}
   .board{padding:clamp(28px,4vw,56px);display:flex;flex-direction:column;justify-content:center;min-height:440px;transition:background .5s,color .5s}
   .board .sample{font-size:clamp(46px,6.5vw,96px);line-height:1.02;word-break:break-word}
   .board .sub{margin-top:18px;font-size:16px;opacity:.85}
@@ -337,13 +345,19 @@
         </div>
         <div class="why">
           <h3 id="moodTitle"></h3>
-          <p id="moodText"></p>
-          <p class="fonts" id="moodFonts"></p>
+          <p class="say" id="moodText"></p>
+          <div class="reason"><h4>Why this palette</h4><p id="whyPal"></p></div>
+          <div class="reason"><h4>Why this type</h4><p id="whyType"></p><p class="fonts" id="moodFonts"></p></div>
           <div class="like"><img id="likeImg" alt=""><div><span class="muted" style="font-size:14px">A project in this spirit</span><br><a id="likeLink" href="#"></a></div></div>
-          <p class="note">This is a first mood, not a finished identity. The real one starts with research into your audience and market.</p>
-          <div class="actions" style="display:flex;gap:12px;flex-wrap:wrap">
+          <p class="note">This is a first creative direction, not a brand strategy. A real identity starts with research into your audience, market and goals, and that is where we would begin.</p>
+          <div class="actions">
             <a class="btn btn-solid" id="moodMail" href="#contact">Start a project with this mood</a>
-            <button class="btn btn-text" id="moodAgain" type="button">Try other words</button>
+            <div class="sec">
+              <button class="btn btn-text" id="moodCopy" type="button">Copy mood</button>
+              <button class="btn btn-text" id="moodShare" type="button">Share my brand mood</button>
+              <button class="btn btn-text" id="moodAgain" type="button">Try other words</button>
+            </div>
+            <p class="toast" id="moodToast" aria-live="polite"></p>
           </div>
         </div>
       </div>
@@ -405,6 +419,7 @@
     <form class="contact-form" action="https://formsubmit.co/nasstas.iss@icloud.com" method="POST">
       <input type="hidden" name="_subject" value="New project request from your website">
       <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="brand_mood" id="cfMood">
       <input type="hidden" name="_captcha" value="false">
       <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="row2">
@@ -447,21 +462,21 @@
 (function(){
   var WORDS=["calm","bold","playful","warm","premium","natural","modern","nostalgic","feminine","edgy","honest","dreamy"];
   var MOODS=[
-   {id:"quiet",title:"Quiet luxury",tags:{calm:2,premium:3,modern:1,feminine:1},bg:"#F3EFE8",fg:"#2B2622",pal:["#F3EFE8","#D9CFC1","#8C7B6B","#2B2622"],names:["Linen","Sand","Taupe","Espresso"],font:"'Cormorant Garamond',serif",w:500,up:true,fontName:"Cormorant Garamond + Montserrat",text:"Few colours, wide spacing, a thin elegant serif. The brand speaks softly and is noticed for it.",case:"noctov"},
-   {id:"botanical",title:"Botanical, handmade",tags:{natural:3,warm:2,honest:2,calm:1,nostalgic:1},bg:"#EEF0E6",fg:"#3E4A2E",pal:["#EEF0E6","#B9C29A","#6B7A46","#7A1F1A"],names:["Petal","Sage","Olive","Poppy"],font:"'Marcellus',serif",w:400,up:false,fontName:"Marcellus + a hand-drawn mark",text:"Muted greens, a deep red accent and a mark drawn by hand. Feels picked, wrapped and given in person.",case:"herbier"},
-   {id:"sweet",title:"Playful and sweet",tags:{playful:3,warm:2,honest:1,dreamy:1,feminine:1},bg:"#F7E3E6",fg:"#5A2A1E",pal:["#F7E3E6","#F2A7B4","#A9C7E8","#5A2A1E"],names:["Frosting","Strawberry","Blueberry milk","Chocolate"],font:"'Caprasimo',serif",w:400,up:false,fontName:"Caprasimo + Figtree",text:"Round letters, candy colours and doodles. Happy and generous, but still grown-up.",case:"elevated-dough"},
-   {id:"bold",title:"Bold and graphic",tags:{bold:3,edgy:3,modern:2},bg:"#141414",fg:"#F2F0EA",pal:["#141414","#F2F0EA","#D7FF3A","#7A7A7A"],names:["Ink","Chalk","Signal","Concrete"],font:"'Syne',sans-serif",w:700,up:true,fontName:"Syne + Montserrat",text:"High contrast, heavy type, one loud accent. Made to be seen from across the street.",case:"noctov"},
-   {id:"night",title:"Soft night ritual",tags:{dreamy:3,calm:2,premium:1,feminine:2,warm:1},bg:"#1E2A44",fg:"#F3E9DA",pal:["#1E2A44","#F3E9DA","#C9A46A","#9EC3E6"],names:["Midnight","Cream","Gold","Sky"],font:"'Bodoni Moda',serif",w:400,up:false,italic:true,fontName:"Bodoni Moda italic + Montserrat",text:"Deep blue, cream and a touch of gold. Slow, warm, made for the end of the day.",case:"brea"},
-   {id:"heritage",title:"Warm heritage",tags:{nostalgic:3,warm:2,honest:2,bold:1},bg:"#F1E6D4",fg:"#3B2416",pal:["#F1E6D4","#C8833F","#6E3B22","#2F4A3A"],names:["Parchment","Caramel","Leather","Bottle green"],font:"'Young Serif',serif",w:400,up:false,fontName:"Young Serif + Montserrat",text:"Old-school serifs, stamps and earthy tones. Feels like it has been around for decades.",case:"koji"},
-   {id:"clean",title:"Clean and modern",tags:{modern:3,calm:1,honest:2,natural:1,premium:1},bg:"#F6F7F8",fg:"#1F2A33",pal:["#F6F7F8","#DCE6EE","#7FA3BE","#1F2A33"],names:["Air","Mist","Water","Slate"],font:"'Montserrat',sans-serif",w:500,up:true,fontName:"Montserrat + Montserrat",text:"Clean sans-serif, pale blues and lots of white. Clear and trustworthy, nothing extra.",case:"mireva"},
-   {id:"feminine",title:"Romantic editorial",tags:{feminine:3,dreamy:2,premium:2,playful:1},bg:"#F4E9E4",fg:"#4A2230",pal:["#F4E9E4","#E3BFC4","#A86476","#4A2230"],names:["Blush","Rose","Mauve","Plum"],font:"'Kalnia',serif",w:300,up:true,fontName:"Kalnia + Montserrat",text:"Dusty pinks and a high-contrast serif, like a fashion magazine cover.",case:"mireva"}
+   {id:"quiet",title:"Quiet luxury",tags:{calm:2,premium:3,modern:1,feminine:1},bg:"#F3EFE8",fg:"#2B2622",pal:["#F3EFE8","#D9CFC1","#8C7B6B","#2B2622"],names:["Linen","Sand","Taupe","Espresso"],font:"'Cormorant Garamond',serif",w:500,up:true,fontName:"Cormorant Garamond + Montserrat",say:"To me that sounds like a brand that never has to raise its voice. I would keep {n} restrained and confident, so people notice it exactly because it is so calm.",palWhy:"Linen, sand and taupe make a soft, expensive base, and espresso gives weight to the logo and text. Nothing shouts, so your product stays the star.",typeWhy:"Cormorant Garamond is thin and refined, like engraving on good paper. Montserrat keeps everyday text clean and easy to read.",case:"noctov"},
+   {id:"botanical",title:"Botanical, handmade",tags:{natural:3,warm:2,honest:2,calm:1,nostalgic:1},bg:"#EEF0E6",fg:"#3E4A2E",pal:["#EEF0E6","#B9C29A","#6B7A46","#7A1F1A"],names:["Petal","Sage","Olive","Poppy"],font:"'Marcellus',serif",w:400,up:false,fontName:"Marcellus + a hand-drawn mark",say:"I hear something made by hand: flowers wrapped in paper, a note written with a real pen. I would give {n} a mark drawn by hand, so it feels personal from the first glance.",palWhy:"Sage and olive come straight from the garden and keep things calm. Poppy red is the small surprise that makes the brand memorable.",typeWhy:"Marcellus has the gentle, carved feel of old botanical prints, and a hand-drawn mark next to it adds a warmth no font can give.",case:"herbier"},
+   {id:"sweet",title:"Playful and sweet",tags:{playful:3,warm:2,honest:1,dreamy:1,feminine:1},bg:"#F7E3E6",fg:"#5A2A1E",pal:["#F7E3E6","#F2A7B4","#A9C7E8","#5A2A1E"],names:["Frosting","Strawberry","Blueberry milk","Chocolate"],font:"'Caprasimo',serif",w:400,up:false,fontName:"Caprasimo + Figtree",say:"This one makes me smile. I would make {n} feel like a treat: generous, a little cheeky, but never childish.",palWhy:"Frosting pink and blueberry milk are soft and almost edible, and chocolate brown keeps everything grounded and readable.",typeWhy:"Caprasimo is round and juicy, perfect for a name you want people to say out loud. Figtree keeps the small text friendly and clear.",case:"elevated-dough"},
+   {id:"bold",title:"Bold and graphic",tags:{bold:3,edgy:3,modern:2},bg:"#141414",fg:"#F2F0EA",pal:["#141414","#F2F0EA","#D7FF3A","#7A7A7A"],names:["Ink","Chalk","Signal","Concrete"],font:"'Syne',sans-serif",w:700,up:true,fontName:"Syne + Montserrat",say:"You want {n} to be impossible to miss. I would build it on strong contrast and confident type, the kind of brand you recognise from across the street.",palWhy:"Ink and chalk give maximum contrast. Signal green is used sparingly, so every time it appears it grabs attention.",typeWhy:"Syne is wide and a little unusual, which gives the name character at large sizes. Montserrat stays neutral and lets it lead.",case:"noctov"},
+   {id:"night",title:"Soft night ritual",tags:{dreamy:3,calm:2,premium:1,feminine:2,warm:1},bg:"#1E2A44",fg:"#F3E9DA",pal:["#1E2A44","#F3E9DA","#C9A46A","#9EC3E6"],names:["Midnight","Cream","Gold","Sky"],font:"'Bodoni Moda',serif",w:400,up:false,italic:true,fontName:"Bodoni Moda italic + Montserrat",say:"It sounds like the end of a long day: lights down, something soft and slow. I would make {n} feel like a small ritual people look forward to.",palWhy:"Midnight blue sets the mood, cream keeps it warm rather than cold, and a touch of gold makes it feel like a little luxury.",typeWhy:"Bodoni Moda in italic is elegant and a little sensual, like a handwritten invitation. Montserrat takes care of the practical details.",case:"brea"},
+   {id:"heritage",title:"Warm heritage",tags:{nostalgic:3,warm:2,honest:2,bold:1},bg:"#F1E6D4",fg:"#3B2416",pal:["#F1E6D4","#C8833F","#6E3B22","#2F4A3A"],names:["Parchment","Caramel","Leather","Bottle green"],font:"'Young Serif',serif",w:400,up:false,fontName:"Young Serif + Montserrat",say:"I picture a place with history: worn wood, recipes passed down. I would give {n} the feeling that it has been around for years, even if it launches tomorrow.",palWhy:"Parchment and caramel feel warm and familiar, leather adds depth, and bottle green brings a classic, trustworthy note.",typeWhy:"Young Serif has soft, chunky serifs that feel friendly and old-school. Paired with Montserrat it stays readable on modern screens.",case:"koji"},
+   {id:"clean",title:"Clean and modern",tags:{modern:3,calm:1,honest:2,natural:1,premium:1},bg:"#F6F7F8",fg:"#1F2A33",pal:["#F6F7F8","#DCE6EE","#7FA3BE","#1F2A33"],names:["Air","Mist","Water","Slate"],font:"'Montserrat',sans-serif",w:500,up:true,fontName:"Montserrat + Montserrat",say:"You want {n} to feel clear and honest, with nothing extra. I would keep it simple and light, so people trust it at first sight.",palWhy:"Plenty of white and pale blue feel fresh and open. Slate gives the text enough weight to stay sharp and serious.",typeWhy:"Montserrat in two weights is all it needs: modern, precise and easy to use everywhere, from a label to an app.",case:"mireva"},
+   {id:"feminine",title:"Romantic editorial",tags:{feminine:3,dreamy:2,premium:2,playful:1},bg:"#F4E9E4",fg:"#4A2230",pal:["#F4E9E4","#E3BFC4","#A86476","#4A2230"],names:["Blush","Rose","Mauve","Plum"],font:"'Kalnia',serif",w:300,up:true,fontName:"Kalnia + Montserrat",say:"This feels like a fashion magazine opened on a slow Sunday. I would make {n} soft and romantic, with enough confidence to feel premium.",palWhy:"Blush and rose are delicate, mauve adds depth, and plum makes the logo and text feel grown-up.",typeWhy:"Kalnia has dramatic contrast and a fashion feel, beautiful for the name at large sizes. Montserrat keeps everything else calm.",case:"mireva"}
   ];
   var CASES={noctov:["NOCTOV","img/noctov.jpg"],herbier:["herbier","img/herbier.jpg"],"elevated-dough":["Elevated Dough","img/dough.jpg"],brea:["BREA","img/brea.jpg"],koji:["KOJI","img/koji.jpg"],mireva:["MIREVA","img/mireva.jpg"]};
   var chosen=[], chips=document.getElementById('chips'), go=document.getElementById('moodGo'), count=document.getElementById('count'), nameIn=document.getElementById('brandName');
   WORDS.forEach(function(w){var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=w;b.setAttribute('aria-pressed','false');b.onclick=function(){toggle(w,b)};chips.appendChild(b)});
   function toggle(w,b){var i=chosen.indexOf(w);if(i>-1){chosen.splice(i,1);b.setAttribute('aria-pressed','false')}else if(chosen.length<3){chosen.push(w);b.setAttribute('aria-pressed','true')}update()}
   function update(){count.textContent=chosen.length+' of 3 chosen';go.disabled=chosen.length!==3;Array.prototype.forEach.call(chips.children,function(c){c.disabled=chosen.length===3&&c.getAttribute('aria-pressed')!=='true'});if(!document.getElementById('result').hidden)render()}
-  nameIn.addEventListener('input',function(){if(!document.getElementById('result').hidden)paintName()});
+  nameIn.addEventListener('input',function(){if(!document.getElementById('result').hidden)render()});
   function pick(){var best=null,score=-1;MOODS.forEach(function(m){var s=0;chosen.forEach(function(w){s+=(m.tags[w]||0)});if(s>score){score=s;best=m}});return best}
   var current=null;
   function paintName(){var n=(nameIn.value||'').trim()||'Your brand';var el=document.getElementById('sample');el.textContent=current.up?n.toUpperCase():n}
@@ -470,11 +485,11 @@
     var board=document.getElementById('board');board.style.background=m.bg;board.style.color=m.fg;
     var el=document.getElementById('sample');el.style.fontFamily=m.font;el.style.fontWeight=m.w;el.style.fontStyle=m.italic?'italic':'normal';el.style.letterSpacing=m.up?'.04em':'0';
     paintName();
-    document.getElementById('sampleSub').textContent=chosen.join(' · ');
+    document.getElementById('sampleSub').textContent=chosen.join(', ');
     var sw=document.getElementById('swatches');sw.innerHTML='';
     m.pal.forEach(function(c,i){var d=document.createElement('div');d.style.background=c;var h=c.replace('#','');var L=(parseInt(h.substr(0,2),16)*299+parseInt(h.substr(2,2),16)*587+parseInt(h.substr(4,2),16)*114)/1000;d.style.color=L>150?'#2B140F':'#FAF8F5';if(c.toLowerCase()===m.bg.toLowerCase())d.style.boxShadow='inset 0 0 0 1px rgba(0,0,0,.12)';d.textContent=m.names[i]+' '+c;sw.appendChild(d)});
     document.getElementById('moodTitle').textContent=m.title;
-    document.getElementById('moodText').textContent=m.text;
+    var nm=(nameIn.value||'').trim()||'your brand';document.getElementById('moodText').textContent='You picked '+chosen[0]+', '+chosen[1]+' and '+chosen[2]+'. '+m.say.replace('{n}',nm);document.getElementById('whyPal').textContent=m.palWhy;document.getElementById('whyType').textContent=m.typeWhy;
     document.getElementById('moodFonts').textContent='Type pairing: '+m.fontName;
     var c=CASES[m.case];document.getElementById('likeImg').src=c[1];document.getElementById('likeImg').alt=c[0]+' cover';var a=document.getElementById('likeLink');a.textContent=c[0];a.href='work/'+m.case+'.html';
     var n=(nameIn.value||'').trim()||'my brand';
@@ -483,7 +498,15 @@
   }
   document.getElementById('moodForm').addEventListener('submit',function(e){e.preventDefault();if(chosen.length!==3)return;var r=document.getElementById('result');r.hidden=false;render();requestAnimationFrame(function(){r.classList.add('show')});r.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})});
   document.getElementById('moodAgain').addEventListener('click',function(){chosen=[];Array.prototype.forEach.call(chips.children,function(c){c.setAttribute('aria-pressed','false')});update();var r=document.getElementById('result');r.classList.remove('show');r.hidden=true;document.getElementById('mood').scrollIntoView({behavior:'smooth'})});
-  document.getElementById('moodMail').addEventListener('click',function(e){if(!current)return;var n=(nameIn.value||'').trim();if(n)document.getElementById('cfBrand').value=n;document.getElementById('cfMsg').value='My brand mood: '+current.title+' ('+chosen.join(', ')+'). Palette: '+current.pal.join(', ')+'.\n\nAbout my project: ';});
+  function summary(){var n=(nameIn.value||'').trim()||'My brand';var m=current;return n+' brand mood: '+m.title+'\nWords: '+chosen.join(', ')+'\nPalette: '+m.pal.map(function(c,i){return m.names[i]+' '+c}).join(', ')+'\nType: '+m.fontName}
+  function shareUrl(){var n=(nameIn.value||'').trim();return location.origin+location.pathname+'?w='+encodeURIComponent(chosen.join(','))+(n?'&n='+encodeURIComponent(n):'')+'#mood'}
+  var toastT;function toast(t){var el=document.getElementById('moodToast');el.textContent=t;clearTimeout(toastT);toastT=setTimeout(function(){el.textContent=''},2600)}
+  function copy(t,ok){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(function(){toast(ok)},function(){fallback(t,ok)})}else fallback(t,ok)}
+  function fallback(t,ok){var a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy');toast(ok)}catch(e){toast('Could not copy. Select the text and copy it by hand.')}document.body.removeChild(a)}
+  document.getElementById('moodCopy').addEventListener('click',function(){if(current)copy(summary()+'\n\n'+shareUrl(),'Mood copied')});
+  document.getElementById('moodShare').addEventListener('click',function(){if(!current)return;var n=(nameIn.value||'').trim()||'my brand';var data={title:'Brand mood for '+n,text:'My brand mood for '+n+': '+current.title+' ('+chosen.join(', ')+').',url:shareUrl()};if(navigator.share){navigator.share(data).catch(function(){})}else copy(data.url,'Link copied. Send it to your partner or team.')});
+  document.getElementById('moodMail').addEventListener('click',function(){if(!current)return;var n=(nameIn.value||'').trim();if(n)document.getElementById('cfBrand').value=n;var sm=summary();document.getElementById('cfMood').value=sm.replace(/\n/g,' | ');document.getElementById('cfMsg').value=sm+'\n\nAbout my project: ';setTimeout(function(){var t=document.getElementById('cfMsg');try{t.focus({preventScroll:true});t.setSelectionRange(t.value.length,t.value.length)}catch(e){}},700)});
+  (function(){var q=new URLSearchParams(location.search);var w=(q.get('w')||'').split(',').filter(function(x){return WORDS.indexOf(x)>-1}).slice(0,3);if(w.length!==3)return;if(q.get('n'))nameIn.value=q.get('n').slice(0,28);Array.prototype.forEach.call(chips.children,function(b){if(w.indexOf(b.textContent)>-1){chosen.push(b.textContent);b.setAttribute('aria-pressed','true')}});update();var r=document.getElementById('result');r.hidden=false;render();r.classList.add('show');setTimeout(function(){r.scrollIntoView({block:'start'})},300)})();
 })();
 </script>
 </body>
