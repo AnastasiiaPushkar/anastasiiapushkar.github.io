@@ -170,9 +170,12 @@
   .why{padding:clamp(28px,4vw,56px);display:flex;flex-direction:column;gap:18px}
   .why h3{font-family:"Marcellus",serif;font-weight:400;font-size:clamp(26px,2.4vw,34px);text-transform:uppercase;letter-spacing:.04em}
   .why .fonts{font-size:14px;color:var(--ink-soft)}
-  .why .like{display:flex;gap:16px;align-items:center;margin-top:6px}
-  .why .like img{width:96px;height:96px;object-fit:cover}
-  .why .like a{text-decoration:underline;text-underline-offset:5px}
+  .why .likes ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+  .why .likes a{display:flex;gap:12px;align-items:center}
+  .why .likes img{width:72px;height:72px;object-fit:cover;flex:none}
+  .why .likes span.n{text-decoration:underline;text-underline-offset:5px;font-size:15px;line-height:1.3}
+  .why .likes a:hover span.n{color:var(--burgundy)}
+  @media (max-width:420px){.why .likes ul{grid-template-columns:1fr}}
   .why .note{font-size:14px;color:var(--ink-soft)}
   .why .actions{margin-top:auto;padding-top:10px}
   @media (max-width:860px){.result{grid-template-columns:1fr}.board{min-height:340px}}
@@ -348,7 +351,7 @@
           <p class="say" id="moodText"></p>
           <div class="reason"><h4>Why this palette</h4><p id="whyPal"></p></div>
           <div class="reason"><h4>Why this type</h4><p id="whyType"></p><p class="fonts" id="moodFonts"></p></div>
-          <div class="like"><img id="likeImg" alt=""><div><span class="muted" style="font-size:14px">A project in this spirit</span><br><a id="likeLink" href="#"></a></div></div>
+          <div class="likes"><span class="muted" style="font-size:14px">Projects in this spirit</span><ul id="likes"></ul></div>
           <p class="note">This is a first creative direction, not a brand strategy. A real identity starts with research into your audience, market and goals, and that is where we would begin.</p>
           <div class="actions">
             <a class="btn btn-solid" id="moodMail" href="#contact">Start a project with this mood</a>
@@ -471,7 +474,26 @@
    {id:"clean",title:"Clean and modern",tags:{modern:3,calm:1,honest:2,natural:1,premium:1},bg:"#F6F7F8",fg:"#1F2A33",pal:["#F6F7F8","#DCE6EE","#7FA3BE","#1F2A33"],names:["Air","Mist","Water","Slate"],font:"'Montserrat',sans-serif",w:500,up:true,fontName:"Montserrat + Montserrat",say:"You want {n} to feel clear and honest, with nothing extra. I would keep it simple and light, so people trust it at first sight.",palWhy:"Plenty of white and pale blue feel fresh and open. Slate gives the text enough weight to stay sharp and serious.",typeWhy:"Montserrat in two weights is all it needs: modern, precise and easy to use everywhere, from a label to an app.",case:"mireva"},
    {id:"feminine",title:"Romantic editorial",tags:{feminine:3,dreamy:2,premium:2,playful:1},bg:"#F4E9E4",fg:"#4A2230",pal:["#F4E9E4","#E3BFC4","#A86476","#4A2230"],names:["Blush","Rose","Mauve","Plum"],font:"'Kalnia',serif",w:300,up:true,fontName:"Kalnia + Montserrat",say:"This feels like a fashion magazine opened on a slow Sunday. I would make {n} soft and romantic, with enough confidence to feel premium.",palWhy:"Blush and rose are delicate, mauve adds depth, and plum makes the logo and text feel grown-up.",typeWhy:"Kalnia has dramatic contrast and a fashion feel, beautiful for the name at large sizes. Montserrat keeps everything else calm.",case:"mireva"}
   ];
-  var CASES={noctov:["NOCTOV","img/noctov.jpg"],herbier:["herbier","img/herbier.jpg"],"elevated-dough":["Elevated Dough","img/dough.jpg"],brea:["BREA","img/brea.jpg"],koji:["KOJI","img/koji.jpg"],mireva:["MIREVA","img/mireva.jpg"]};
+  var PROJ={
+   noctov:["NOCTOV","img/noctov.jpg","work/noctov",["premium","modern","calm","bold"]],
+   herbier:["herbier","img/herbier.jpg","work/herbier",["natural","honest","warm","nostalgic"]],
+   "elevated-dough":["Elevated Dough","img/dough.jpg","work/elevated-dough",["playful","warm","honest"]],
+   brea:["BREA","img/brea.jpg","work/brea",["dreamy","warm","feminine","premium"]],
+   koji:["KOJI","img/koji.jpg","work/koji",["nostalgic","calm","honest","natural"]],
+   mireva:["MIREVA","img/mireva.jpg","work/mireva",["modern","calm","honest","feminine"]],
+   seavere:["SEAVERE","img/archive/thumbs/seavere.jpg","all-work#seavere",["calm","premium","natural"]],
+   stykhiyna:["STYKHIYNA","img/archive/thumbs/stykhiyna.jpg","all-work#stykhiyna",["premium","feminine","modern"]],
+   tsukiyo:["TSUKIYO","img/archive/thumbs/tsukiyo.jpg","all-work#tsukiyo",["dreamy","calm","premium","feminine"]],
+   "good-tea-shop":["Good Tea Shop","img/archive/thumbs/good-tea.jpg","all-work#good-tea-shop",["calm","natural","honest"]],
+   "the-inner-fuel":["The Inner Fuel","img/archive/thumbs/inner-fuel.jpg","all-work#the-inner-fuel",["natural","warm","honest"]],
+   "gyros-spot":["The Gyros Spot","img/archive/thumbs/gyros.jpg","all-work#gyros-spot",["playful","bold","warm"]],
+   cncrt:["CNCRT.","img/archive/thumbs/cncrt.jpg","all-work#cncrt",["bold","edgy","playful"]],
+   nevro:["NEVRO","img/archive/thumbs/nevro.jpg","all-work#nevro",["edgy","bold","modern"]],
+   "mireva-tiles":["MIREVA product tiles","img/archive/thumbs/mireva-tiles.jpg","all-work#mireva-tiles",["modern","dreamy","calm"]],
+   bjaf:["Bjaf Probiotic+","img/archive/thumbs/bjaf.jpg","all-work#bjaf",["playful","honest","warm"]]
+  };
+  var POOL={quiet:["noctov","seavere","stykhiyna","tsukiyo"],botanical:["herbier","good-tea-shop","the-inner-fuel","koji"],sweet:["elevated-dough","gyros-spot","bjaf"],bold:["cncrt","nevro","gyros-spot","noctov"],night:["brea","tsukiyo","seavere"],heritage:["koji","good-tea-shop","the-inner-fuel","herbier"],clean:["mireva","mireva-tiles","seavere"],feminine:["mireva","stykhiyna","tsukiyo","brea"]};
+  function related(m){var pool=POOL[m.id]||[m.case];return pool.map(function(k,i){var s=0;PROJ[k][3].forEach(function(t){if(chosen.indexOf(t)>-1)s+=2});return {k:k,s:s-i*0.5}}).sort(function(a,b){return b.s-a.s}).slice(0,2).map(function(x){return x.k})}
   var chosen=[], chips=document.getElementById('chips'), go=document.getElementById('moodGo'), count=document.getElementById('count'), nameIn=document.getElementById('brandName');
   WORDS.forEach(function(w){var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=w;b.setAttribute('aria-pressed','false');b.onclick=function(){toggle(w,b)};chips.appendChild(b)});
   function toggle(w,b){var i=chosen.indexOf(w);if(i>-1){chosen.splice(i,1);b.setAttribute('aria-pressed','false')}else if(chosen.length<3){chosen.push(w);b.setAttribute('aria-pressed','true')}update()}
@@ -491,7 +513,7 @@
     document.getElementById('moodTitle').textContent=m.title;
     var nm=(nameIn.value||'').trim()||'your brand';document.getElementById('moodText').textContent='You picked '+chosen[0]+', '+chosen[1]+' and '+chosen[2]+'. '+m.say.replace('{n}',nm);document.getElementById('whyPal').textContent=m.palWhy;document.getElementById('whyType').textContent=m.typeWhy;
     document.getElementById('moodFonts').textContent='Type pairing: '+m.fontName;
-    var c=CASES[m.case];document.getElementById('likeImg').src=c[1];document.getElementById('likeImg').alt=c[0]+' cover';var a=document.getElementById('likeLink');a.textContent=c[0];a.href='work/'+m.case;
+    var ul=document.getElementById('likes');ul.innerHTML='';related(m).forEach(function(k){var p=PROJ[k];var li=document.createElement('li');var a=document.createElement('a');a.href=p[2];var im=document.createElement('img');im.src=p[1];im.alt=p[0]+' cover';var sp=document.createElement('span');sp.className='n';sp.textContent=p[0];a.appendChild(im);a.appendChild(sp);li.appendChild(a);ul.appendChild(li)});
     var n=(nameIn.value||'').trim()||'my brand';
     var body='Hi Anastasiia,\n\nI tried the brand mood on your site.\nBrand: '+n+'\nWords: '+chosen.join(', ')+'\nMood: '+m.title+' ('+m.pal.join(', ')+')\n\nHere is a bit about my project:\n';
     window.__moodMail='mailto:nasstas.iss@icloud.com?subject='+encodeURIComponent('New project: '+n)+'&body='+encodeURIComponent(body);
