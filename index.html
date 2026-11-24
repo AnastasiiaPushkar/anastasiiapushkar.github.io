@@ -357,7 +357,7 @@
             <a class="btn btn-solid" id="moodMail" href="#contact">Start a project with this mood</a>
             <div class="sec">
               <button class="btn btn-text" id="moodCopy" type="button">Copy mood</button>
-              <button class="btn btn-text" id="moodShare" type="button">Share my brand mood</button>
+              <button class="btn btn-text" id="moodShare" type="button">Share as image</button>
               <button class="btn btn-text" id="moodAgain" type="button">Try other words</button>
             </div>
             <p class="toast" id="moodToast" aria-live="polite"></p>
@@ -526,7 +526,31 @@
   function copy(t,ok){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(function(){toast(ok)},function(){fallback(t,ok)})}else fallback(t,ok)}
   function fallback(t,ok){var a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy');toast(ok)}catch(e){toast('Could not copy. Select the text and copy it by hand.')}document.body.removeChild(a)}
   document.getElementById('moodCopy').addEventListener('click',function(){if(current)copy(summary()+'\n\n'+shareUrl(),'Mood copied')});
-  document.getElementById('moodShare').addEventListener('click',function(){if(!current)return;var n=(nameIn.value||'').trim()||'my brand';var data={title:'Brand mood for '+n,text:'My brand mood for '+n+': '+current.title+' ('+chosen.join(', ')+').',url:shareUrl()};if(navigator.share){navigator.share(data).catch(function(){})}else copy(data.url,'Link copied. Send it to your partner or team.')});
+  function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+  function lum(c){var h=c.replace('#','');return (parseInt(h.substr(0,2),16)*299+parseInt(h.substr(2,2),16)*587+parseInt(h.substr(4,2),16)*114)/1000}
+  function wrap(c,t,x,y,maxW,lh){var w=t.split(' '),line='',lines=[];w.forEach(function(x2){var tst=line?line+' '+x2:x2;if(c.measureText(tst).width>maxW&&line){lines.push(line);line=x2}else line=tst});lines.push(line);lines.forEach(function(l,k){c.fillText(l,x,y+k*lh)});return lines.length}
+  function makeCard(){var m=current,W=1080,H=1350,P=96;var nm=(nameIn.value||'').trim()||'Your brand';
+   var disp=(m.italic?'italic ':'')+m.w+' 140px '+m.font;
+   return Promise.all([document.fonts.load(disp,nm),document.fonts.load('500 30px Montserrat'),document.fonts.load('400 30px Montserrat'),document.fonts.load('400 40px Marcellus')]).catch(function(){}).then(function(){
+    var cv=document.createElement('canvas');cv.width=W;cv.height=H;var c=cv.getContext('2d');
+    c.fillStyle=m.bg;c.fillRect(0,0,W,H);c.fillStyle=m.fg;c.textBaseline='alphabetic';
+    c.font='500 28px Montserrat';c.globalAlpha=.7;c.fillText('Brand mood',P,P+20);c.textAlign='right';c.fillText(chosen.join(', '),W-P,P+20);c.textAlign='left';c.globalAlpha=1;
+    var size=150,txt=m.up?nm.toUpperCase():nm;c.font=(m.italic?'italic ':'')+m.w+' '+size+'px '+m.font;while(c.measureText(txt).width>W-2*P&&size>48){size-=4;c.font=(m.italic?'italic ':'')+m.w+' '+size+'px '+m.font}
+    c.fillText(txt,P,P+120+size*.8);
+    var y=P+120+size*.8+70;c.font='400 44px Marcellus';c.fillText(m.title.toUpperCase(),P,y);
+    var sy=y+70,gap=20,sw=(W-2*P-3*gap)/4,sh=520;
+    m.pal.forEach(function(col,k){var x=P+k*(sw+gap);c.fillStyle=col;rr(c,x,sy,sw,sh,6);c.fill();if(col.toLowerCase()===m.bg.toLowerCase()){c.strokeStyle='rgba(0,0,0,.14)';c.lineWidth=2;c.stroke()}
+      c.fillStyle=lum(col)>150?'#2B140F':'#FAF8F5';var fs=26;c.font='500 '+fs+'px Montserrat';while(c.measureText(m.names[k]).width>sw-40&&fs>16){fs--;c.font='500 '+fs+'px Montserrat'}c.fillText(m.names[k],x+22,sy+sh-58);c.font='400 22px Montserrat';c.globalAlpha=.8;c.fillText(col.toUpperCase(),x+22,sy+sh-24);c.globalAlpha=1});
+    c.fillStyle=m.fg;var ty=sy+sh+80;c.font='400 26px Montserrat';c.globalAlpha=.7;c.fillText('Type',P,ty);c.globalAlpha=1;c.font='500 32px Montserrat';c.fillText(m.fontName,P,ty+46);
+    c.font='400 26px Montserrat';c.globalAlpha=.7;c.fillText('Find your brand mood at',P,H-P-38);c.globalAlpha=1;c.font='500 32px Montserrat';c.fillText('anastasiiapushkar.github.io',P,H-P);
+    return new Promise(function(res){cv.toBlob(function(b){res(b)},'image/png')})})}
+  document.getElementById('moodShare').addEventListener('click',function(){if(!current)return;var btn=this;var n=(nameIn.value||'').trim()||'my brand';btn.disabled=true;
+   makeCard().then(function(blob){btn.disabled=false;if(!blob){toast('Could not create the image');return}
+    var fname='brand-mood-'+n.toLowerCase().replace(/[^a-z0-9а-яіїєґ]+/gi,'-').replace(/^-|-$/g,'')+'.png';var file=new File([blob],fname,{type:'image/png'});
+    var data={files:[file],title:'Brand mood for '+n,text:'My brand mood for '+n+': '+current.title+'. Find yours at anastasiiapushkar.github.io'};
+    if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share(data).catch(function(){})}
+    else{var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500);toast('Image saved. Share it wherever you like.')}
+   })});
   document.getElementById('moodMail').addEventListener('click',function(){if(!current)return;var n=(nameIn.value||'').trim();if(n)document.getElementById('cfBrand').value=n;var sm=summary();document.getElementById('cfMood').value=sm.replace(/\n/g,' | ');document.getElementById('cfMsg').value=sm+'\n\nAbout my project: ';setTimeout(function(){var t=document.getElementById('cfMsg');try{t.focus({preventScroll:true});t.setSelectionRange(t.value.length,t.value.length)}catch(e){}},700)});
   (function(){var q=new URLSearchParams(location.search);var w=(q.get('w')||'').split(',').filter(function(x){return WORDS.indexOf(x)>-1}).slice(0,3);if(w.length!==3)return;if(q.get('n'))nameIn.value=q.get('n').slice(0,28);Array.prototype.forEach.call(chips.children,function(b){if(w.indexOf(b.textContent)>-1){chosen.push(b.textContent);b.setAttribute('aria-pressed','true')}});update();var r=document.getElementById('result');r.hidden=false;render();r.classList.add('show');setTimeout(function(){r.scrollIntoView({block:'start'})},300)})();
 })();
