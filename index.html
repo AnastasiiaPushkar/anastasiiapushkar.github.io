@@ -356,6 +356,7 @@
           <div class="actions">
             <a class="btn btn-solid" id="moodMail" href="#contact">Start a project with this mood</a>
             <div class="sec">
+              <button class="btn btn-text" id="moodNext" type="button">Show another mood</button>
               <button class="btn btn-text" id="moodCopy" type="button">Copy mood</button>
               <button class="btn btn-text" id="moodShare" type="button">Share as image</button>
               <button class="btn btn-text" id="moodAgain" type="button">Try other words</button>
@@ -498,12 +499,14 @@
   WORDS.forEach(function(w){var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=w;b.setAttribute('aria-pressed','false');b.onclick=function(){toggle(w,b)};chips.appendChild(b)});
   function toggle(w,b){var i=chosen.indexOf(w);if(i>-1){chosen.splice(i,1);b.setAttribute('aria-pressed','false')}else if(chosen.length<3){chosen.push(w);b.setAttribute('aria-pressed','true')}update()}
   function update(){count.textContent=chosen.length+' of 3 chosen';go.disabled=chosen.length!==3;Array.prototype.forEach.call(chips.children,function(c){c.disabled=chosen.length===3&&c.getAttribute('aria-pressed')!=='true'});if(!document.getElementById('result').hidden)render()}
-  nameIn.addEventListener('input',function(){if(!document.getElementById('result').hidden)render()});
-  function pick(){var best=null,score=-1;MOODS.forEach(function(m){var s=0;chosen.forEach(function(w){s+=(m.tags[w]||0)});if(s>score){score=s;best=m}});return best}
+  nameIn.addEventListener('input',function(){if(!document.getElementById('result').hidden&&current)render(false)});
+  var ranked=[],ri=0;
+  function rank(){ranked=MOODS.map(function(m){var s=0;chosen.forEach(function(w){s+=(m.tags[w]||0)});return {m:m,s:s+Math.random()*0.9}}).sort(function(a,b){return b.s-a.s}).map(function(x){return x.m});ri=0}
+  function pick(){return ranked[ri]||MOODS[0]}
   var current=null;
   function paintName(){var n=(nameIn.value||'').trim()||'Your brand';var el=document.getElementById('sample');el.textContent=current.up?n.toUpperCase():n}
-  function render(){
-    current=pick(); var m=current;
+  function render(fresh){
+    if(fresh!==false)rank();current=pick(); var m=current;
     var board=document.getElementById('board');board.style.background=m.bg;board.style.color=m.fg;
     var el=document.getElementById('sample');el.style.fontFamily=m.font;el.style.fontWeight=m.w;el.style.fontStyle=m.italic?'italic':'normal';el.style.letterSpacing=m.up?'.04em':'0';
     paintName();
@@ -519,9 +522,10 @@
     window.__moodMail='mailto:nasstas.iss@icloud.com?subject='+encodeURIComponent('New project: '+n)+'&body='+encodeURIComponent(body);
   }
   document.getElementById('moodForm').addEventListener('submit',function(e){e.preventDefault();if(chosen.length!==3)return;var r=document.getElementById('result');r.hidden=false;render();requestAnimationFrame(function(){r.classList.add('show')});r.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})});
+  document.getElementById('moodNext').addEventListener('click',function(){if(!ranked.length)return;ri=(ri+1)%Math.min(4,ranked.length);render(false);var b=document.getElementById('board');if(b.scrollIntoView&&b.getBoundingClientRect().top<0)b.scrollIntoView({behavior:'smooth',block:'start'})});
   document.getElementById('moodAgain').addEventListener('click',function(){chosen=[];Array.prototype.forEach.call(chips.children,function(c){c.setAttribute('aria-pressed','false')});update();var r=document.getElementById('result');r.classList.remove('show');r.hidden=true;document.getElementById('mood').scrollIntoView({behavior:'smooth'})});
   function summary(){var n=(nameIn.value||'').trim()||'My brand';var m=current;return n+' brand mood: '+m.title+'\nWords: '+chosen.join(', ')+'\nPalette: '+m.pal.map(function(c,i){return m.names[i]+' '+c}).join(', ')+'\nType: '+m.fontName}
-  function shareUrl(){var n=(nameIn.value||'').trim();return location.origin+location.pathname+'?w='+encodeURIComponent(chosen.join(','))+(n?'&n='+encodeURIComponent(n):'')+'#mood'}
+  function shareUrl(){var n=(nameIn.value||'').trim();return location.origin+location.pathname+'?w='+encodeURIComponent(chosen.join(','))+(n?'&n='+encodeURIComponent(n):'')+(current?'&m='+current.id:'')+'#mood'}
   var toastT;function toast(t){var el=document.getElementById('moodToast');el.textContent=t;clearTimeout(toastT);toastT=setTimeout(function(){el.textContent=''},2600)}
   function copy(t,ok){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(function(){toast(ok)},function(){fallback(t,ok)})}else fallback(t,ok)}
   function fallback(t,ok){var a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy');toast(ok)}catch(e){toast('Could not copy. Select the text and copy it by hand.')}document.body.removeChild(a)}
@@ -552,7 +556,7 @@
     else{var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500);toast('Image saved. Share it wherever you like.')}
    })});
   document.getElementById('moodMail').addEventListener('click',function(){if(!current)return;var n=(nameIn.value||'').trim();if(n)document.getElementById('cfBrand').value=n;var sm=summary();document.getElementById('cfMood').value=sm.replace(/\n/g,' | ');document.getElementById('cfMsg').value=sm+'\n\nAbout my project: ';setTimeout(function(){var t=document.getElementById('cfMsg');try{t.focus({preventScroll:true});t.setSelectionRange(t.value.length,t.value.length)}catch(e){}},700)});
-  (function(){var q=new URLSearchParams(location.search);var w=(q.get('w')||'').split(',').filter(function(x){return WORDS.indexOf(x)>-1}).slice(0,3);if(w.length!==3)return;if(q.get('n'))nameIn.value=q.get('n').slice(0,28);Array.prototype.forEach.call(chips.children,function(b){if(w.indexOf(b.textContent)>-1){chosen.push(b.textContent);b.setAttribute('aria-pressed','true')}});update();var r=document.getElementById('result');r.hidden=false;render();r.classList.add('show');setTimeout(function(){r.scrollIntoView({block:'start'})},300)})();
+  (function(){var q=new URLSearchParams(location.search);var w=(q.get('w')||'').split(',').filter(function(x){return WORDS.indexOf(x)>-1}).slice(0,3);if(w.length!==3)return;if(q.get('n'))nameIn.value=q.get('n').slice(0,28);Array.prototype.forEach.call(chips.children,function(b){if(w.indexOf(b.textContent)>-1){chosen.push(b.textContent);b.setAttribute('aria-pressed','true')}});update();var r=document.getElementById('result');r.hidden=false;rank();var mi=-1;ranked.forEach(function(x,k){if(x.id===q.get('m'))mi=k});if(mi>-1){ri=mi}render(false);r.classList.add('show');setTimeout(function(){r.scrollIntoView({block:'start'})},300)})();
 })();
 </script>
 </body>
